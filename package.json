@@ -1,0 +1,36 @@
+{
+  "name": "beton-backend",
+  "version": "1.0.0",
+  "main": "app/index.js",
+  "author": "kulczy",
+  "license": "MIT",
+  "engines": {
+    "node": "~8.11.1",
+    "npm": ">=5.6.0"
+  },
+  "scripts": {
+    "start": "node app/index.js",
+    "dev": "nodemon -r dotenv/config app/index.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "boom": "^7.2.0",
+    "cors": "^2.8.4",
+    "express": "^4.16.3",
+    "moment": "^2.22.1",
+    "moment-timezone": "^0.5.16",
+    "mysql2": "^1.5.3",
+    "sequelize": "^4.37.7"
+  },
+  "devDependencies": {
+    "dotenv": "^5.0.1",
+    "jest": "^22.4.3",
+    "jest-cli": "^22.4.3",
+    "nodemon": "^1.17.4",
+    "supertest": "^3.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  }
+}
