@@ -18,9 +18,12 @@
     "boom": "^7.2.0",
     "cors": "^2.8.4",
     "express": "^4.16.3",
+    "jsonwebtoken": "^8.2.1",
     "moment": "^2.22.1",
     "moment-timezone": "^0.5.16",
     "mysql2": "^1.5.3",
+    "passport": "^0.4.0",
+    "passport-facebook-token": "^3.3.0",
     "sequelize": "^4.37.7"
   },
   "devDependencies": {

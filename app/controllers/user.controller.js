@@ -40,3 +40,13 @@ exports.getUserByFacebookID = async (facebook_id) => {
     where: { facebook_id }
   })
 };
+
+/**
+ * Get user by email
+ * @param {string} email
+ */
+exports.getUserByEmail = async (email) => {
+  return await User.findOne({
+    where: { email }
+  })
+};
