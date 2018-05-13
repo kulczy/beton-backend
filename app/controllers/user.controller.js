@@ -50,3 +50,13 @@ exports.getUserByEmail = async (email) => {
     where: { email }
   })
 };
+
+/**
+ * Get user by ID
+ * @param {int} _id_user
+ */
+exports.getUserByID = async (_id_user) => {
+  return await User.findOne({
+    where: { _id_user }
+  })
+};

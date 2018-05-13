@@ -69,7 +69,7 @@ exports.is = {
     memberStatus(req, res, next, {
       id_user: req.auth._id_user,
       queryTeamBy: '_id_team',
-      gueryTeamValue: req.params._id_team,
+      gueryTeamValue: req.params._id_team || req.body.id_team,
       question: 'is_member'
     });
   },
@@ -89,7 +89,7 @@ exports.is = {
     memberStatus(req, res, next, {
       id_user: req.auth._id_user,
       queryTeamBy: '_id_team',
-      gueryTeamValue: req.params._id_team,
+      gueryTeamValue: req.params._id_team || req.body.id_team,
       question: 'is_admin'
     });
   },
@@ -103,6 +103,26 @@ exports.is = {
       question: 'is_admin'
     });
   },
+
+    // Get is_creator status by ID
+    creatorByID: (req, res, next) => {
+      memberStatus(req, res, next, {
+        id_user: req.auth._id_user,
+        queryTeamBy: '_id_team',
+        gueryTeamValue: req.params._id_team || req.body.id_team,
+        question: 'is_creator'
+      });
+    },
+  
+    // Get is_creator status by URL
+    creatorByURL: (req, res, next) => {
+      memberStatus(req, res, next, {
+        id_user: req.auth._id_user,
+        queryTeamBy: 'url',
+        gueryTeamValue: req.params.url,
+        question: 'is_creator'
+      });
+    },
 
   // Return object instead go next() in express middleware
   membership: (req, res, next) => {

@@ -18,15 +18,21 @@ exports.insertGame = async (gameData) => {
  * creator_id, close_at, id_team, player_a, player_b, score_a, score_b
  */
 exports.updateGame = async (_id_game, gameData) => {
-  return await Game.update(gameData, { where: { _id_game } });
+  return await Game.update(gameData, {
+    where: {
+      _id_game,
+      id_team: gameData.id_team
+    }
+  });
 };
 
 /**
  * Delete game
  * @param {int} _id_game
+ * @param {int} id_team
  */
-exports.deleteGame = async (_id_game) => {
+exports.deleteGame = async (_id_game, id_team) => {
   return await Game.destroy({
-    where: { _id_game }
+    where: { _id_game, id_team }
   });
 };

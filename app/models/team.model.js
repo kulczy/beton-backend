@@ -6,8 +6,7 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true
     },
     created_at: { type: DataTypes.DATE },
-    updated_at: { type: DataTypes.DATE },
-    creator_id: { type: DataTypes.INTEGER, validate: { notEmpty: true } },
+    updated_at: { type: DataTypes.DATE },    
     url: {
       type: DataTypes.UUID,
       unique: true,

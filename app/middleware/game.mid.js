@@ -5,7 +5,10 @@ const gameCtrl = require('../controllers/game.controller');
  */
 exports.gameInsert = async (req, res) => {
   try {
-    const newGame = await gameCtrl.insertGame(req.body);
+    const newGame = await gameCtrl.insertGame({
+      ...req.body,
+      creator_id: req.auth._id_user
+    });
     res.status(200).send(newGame);
   } catch (err) {
     res.status(400).send(err);
@@ -29,7 +32,10 @@ exports.gameUpdate = async (req, res) => {
  */
 exports.gameDelete = async (req, res) => {
   try {
-    const game = await gameCtrl.deleteGame(req.params._id_game);
+    const game = await gameCtrl.deleteGame(
+      req.params._id_game,
+      req.body.id_team
+    );
     res.status(200).send({ resp: game });
   } catch (err) {
     res.status(400).send(err);

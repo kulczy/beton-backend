@@ -93,11 +93,24 @@ exports.userAuth = async (req, res) => {
  * Check if token is valid
  * and add data from token to request
  */
-exports.isLoggedIn = (req, res, next) => {
+exports.isLoggedIn = async (req, res, next) => {
   try {
     req.auth = jwt.verifyToken(req.headers['x-auth-token']);
+    const userExist = await userCtrl.getUserByID(req.auth._id_user);
+    if (!userExist) throw { msg: 'user not exist' };
     next();
   } catch (err) {
     res.status(401).send(err);
   }
+};
+
+/**
+ * Check if user from query 
+ * is the same as user from token
+ */
+exports.isOwner = (req, res, next) => {
+  const idFromQuery = req.params._id_user || req.body.id_user;
+  const idFromToken = req.auth._id_user;
+  if (idFromQuery == idFromToken) next();
+  else res.status(403).send('you do not have permission');
 };
