@@ -67,19 +67,4 @@ exports.teamFullGet = async (req, res) => {
   }
 };
 
-/**
- * Check if user is member by team URL
- */
-exports.teamGetMemberStatus = async (req, res) => {
-  try {
-    const result = await teamCtrl.getStatus(
-      req.body.id_user,
-      req.body.url,
-      req.body.question
-    );
-    res.status(200).send(result);
-  } catch (err) {
-    console.log(err);
-    res.status(400).send(err);
-  }
-};
+

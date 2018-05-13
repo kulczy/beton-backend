@@ -62,21 +62,3 @@ exports.getFullTeam = async (url) => {
   });
 };
 
-/**
- * Check if user is team member
- * @param {int} id_user id of the user who wants the access
- * @param {string} url url of the team
- * @param {string} question what status function shoud check:
- * is_admin or is_member
- */
-exports.getStatus = async (id_user, url, question) => {
-  const status = (question === 'is_admin') ? 'is_admin' : 'is_member';
-  const result = await models.sequelizeInstance.query(
-    `SELECT member.is_member 
-     FROM team 
-     INNER JOIN member ON team._id_team = member.id_team 
-     WHERE member.id_user = ${id_user} AND team.url = "${url}" AND member.${status} = 1`,
-    { type: models.sequelizeInstance.QueryTypes.SELECT }
-  );
-  return result.length ? { [status]: 1 } : { [status]: 0 };
-};

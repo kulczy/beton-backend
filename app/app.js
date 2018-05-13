@@ -33,7 +33,7 @@ router.route('/').get((req, res) => res.status(200).send('Elo world! :D')); // I
 router.route('/team').post(mTeam.teamInsert); // Add new team
 router.route('/team/:_id_team').patch(mTeam.teamUpdate); // Update team
 router.route('/team/:_id_team').delete(mTeam.teamDelete); // Delete team
-router.route('/team/:_id_team').get(mUser.verifyToken, mTeam.teamGet); // Get basic team by ID
+router.route('/team/:_id_team').get(mUser.verifyToken, mMember.is.memberByID, mTeam.teamGet); // Get basic team by ID
 router.route('/full_team/:url').get(mTeam.teamFullGet); // Get full team data by URL
 
 router.route('/member').post(mMember.memberInsert); // Add new member
@@ -53,7 +53,7 @@ router.route('/user/:_id_user').patch(mUser.userUpdate); // Update user data
 router.route('/user/:_id_user').delete(mUser.userDelete); // Delete user
 router.route('/user/:email').get(mUser.userGetByEmail); // Get user by email
 
-router.route('/utils/member_status').get(mTeam.teamGetMemberStatus); // Check if user is team member by URL
+router.route('/utils/member_status').get(mMember.is.membership); // Check if user is team member by URL
 router.route('/utils/auth').get(passport.authenticate('facebook-token', { session: false }), mUser.userAuth); // User auth
 
 module.exports = app;
