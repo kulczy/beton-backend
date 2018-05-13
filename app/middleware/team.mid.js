@@ -9,9 +9,10 @@ exports.teamInsert = async (req, res) => {
     const newTeam = await teamCtrl.insertTeam(req.body);
     const newMember = await memberCtrl.insertMember({
       id_team: newTeam._id_team,
-      id_user: newTeam.creator_id,
+      id_user: req.auth._id_user,
+      is_member: 1,
       is_admin: 1,
-      is_member: 1
+      is_creator: 1
     });
     res.status(200).send({ newTeam, newMember });
   } catch (err) {

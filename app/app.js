@@ -30,10 +30,10 @@ const mUser = require('./middleware/user.mid');
 
 router.route('/').get((req, res) => res.status(200).send('Elo world! :D')); // Index
 
-router.route('/team').post(mTeam.teamInsert); // Add new team
+router.route('/team').post(mUser.isLoggedIn, mTeam.teamInsert); // Add new team
 router.route('/team/:_id_team').patch(mTeam.teamUpdate); // Update team
 router.route('/team/:_id_team').delete(mTeam.teamDelete); // Delete team
-router.route('/team/:_id_team').get(mUser.verifyToken, mMember.is.memberByID, mTeam.teamGet); // Get basic team by ID
+router.route('/team/:_id_team').get(mUser.isLoggedIn, mMember.is.memberByID, mTeam.teamGet); // Get basic team by ID
 router.route('/full_team/:url').get(mTeam.teamFullGet); // Get full team data by URL
 
 router.route('/member').post(mMember.memberInsert); // Add new member

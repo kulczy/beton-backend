@@ -93,7 +93,7 @@ exports.userAuth = async (req, res) => {
  * Check if token is valid
  * and add data from token to request
  */
-exports.verifyToken = (req, res, next) => {
+exports.isLoggedIn = (req, res, next) => {
   try {
     req.auth = jwt.verifyToken(req.headers['x-auth-token']);
     next();
