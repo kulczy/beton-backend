@@ -40,6 +40,9 @@ router.route('/member').post(mUser.isLoggedIn, mMember.is.memberByID, mMember.me
 router.route('/member/:_id_member').patch(mUser.isLoggedIn, mMember.memberUpdate); // Update member status
 router.route('/member/:_id_member').delete(mUser.isLoggedIn, mMember.memberDelete); // Delete membership
 
+router.route('/membership/:_id_user').get(mUser.isLoggedIn, mUser.isOwner, mMember.membershipGet); // Get all user membership
+router.route('/membershipfull/:_id_user').get(mUser.isLoggedIn, mUser.isOwner, mMember.membershipGetFull); // Get all user membership with team data
+
 router.route('/game').post(mUser.isLoggedIn, mMember.is.memberByID, mGame.gameInsert); // Add new game
 router.route('/game/:_id_game').patch(mUser.isLoggedIn, mMember.is.memberByID, mGame.gameUpdate); // Update game data
 router.route('/game/:_id_game').delete(mUser.isLoggedIn, mMember.is.memberByID, mGame.gameDelete); // Delete game

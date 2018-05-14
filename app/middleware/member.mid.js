@@ -40,6 +40,30 @@ exports.memberDelete = async (req, res) => {
 };
 
 /**
+ * Get all user memberships
+ */
+exports.membershipGet = async (req, res) => {
+  try {
+    const member = await memberCtrl.getUserMemberships(req.params._id_user);
+    res.status(200).send({ resp: member });
+  } catch (err) {
+    res.status(400).send(err);
+  }
+};
+
+/**
+ * Get all user memberships with team data
+ */
+exports.membershipGetFull = async (req, res) => {
+  try {
+    const member = await memberCtrl.getUserMembershipsWithTeamData(req.params._id_user);
+    res.status(200).send({ resp: member });
+  } catch (err) {
+    res.status(400).send(err);
+  }
+};
+
+/**
  * Check if user is member or admin
  * by team URL or ID
  */

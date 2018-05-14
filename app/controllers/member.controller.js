@@ -1,5 +1,5 @@
 const models = require('../models');
-const { Member } = models;
+const { Member, Team } = models;
 
 /**
  * Add new member
@@ -29,6 +29,31 @@ exports.updateMemberStatus = async (_id_member, memberData) => {
 exports.deleteMember = async (_id_member) => {
   return await Member.destroy({
     where: { _id_member }
+  });
+};
+
+/**
+ * Get all user memberships
+ * @param {int} id_user 
+ */
+exports.getUserMemberships = async (id_user) => {
+  return await Member.findAll({
+    where: { id_user }
+  });
+};
+
+/**
+ * Get all user memberships with team data
+ * @param {int} id_user 
+ */
+exports.getUserMembershipsWithTeamData = async (id_user) => {
+  return await Member.findAll({
+    where: { id_user },
+    include: [
+      {
+        model: Team
+      }
+    ]
   });
 };
 
