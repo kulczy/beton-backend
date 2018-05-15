@@ -49,11 +49,8 @@ exports.getUserMemberships = async (id_user) => {
 exports.getUserMembershipsWithTeamData = async (id_user) => {
   return await Member.findAll({
     where: { id_user },
-    include: [
-      {
-        model: Team
-      }
-    ]
+    include: { model: Team },
+    order: [['created_at', 'DESC']]
   });
 };
 

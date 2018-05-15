@@ -155,10 +155,10 @@ exports.is = {
       res,
       next,
       {
-        id_user: req.body.id_user,
-        queryTeamBy: req.body.queryTeamBy,
-        gueryTeamValue: req.body.gueryTeamValue,
-        question: req.body.question
+        id_user: req.query.id_user,
+        queryTeamBy: req.query.queryTeamBy,
+        gueryTeamValue: req.query.gueryTeamValue,
+        question: req.query.question
       },
       0
     );
