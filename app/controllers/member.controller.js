@@ -12,29 +12,45 @@ exports.insertMember = async (memberData) => {
 };
 
 /**
+ * Find member or create if exist
+ * @param {int} id_user
+ * @param {int} id_team
+ */
+exports.findOrCreateMember = async (id_user, id_team) => {
+  return await Member.findOrCreate({
+    where: { id_user, id_team },
+    defaults: { id_user, id_team }
+  });
+};
+
+/**
  * Update member status
  * 0 is not member, 1 is member
  * @param {int} _id_member id of membership
  * @param {object} memberData object contains all member data:
  * id_team, id_user, is_member, is_admin
+ * Prevent if user is creator
  */
 exports.updateMemberStatus = async (_id_member, memberData) => {
-  return await Member.update(memberData, { where: { _id_member } });
+  return await Member.update(memberData, {
+    where: { _id_member, is_creator: 0 }
+  });
 };
 
 /**
  * Delete membership
  * @param {int} _id_member id of membership
+ * Prevent if user is creator
  */
 exports.deleteMember = async (_id_member) => {
   return await Member.destroy({
-    where: { _id_member }
+    where: { _id_member, is_creator: 0 }
   });
 };
 
 /**
  * Get all user memberships
- * @param {int} id_user 
+ * @param {int} id_user
  */
 exports.getUserMemberships = async (id_user) => {
   return await Member.findAll({
@@ -44,7 +60,7 @@ exports.getUserMemberships = async (id_user) => {
 
 /**
  * Get all user memberships with team data
- * @param {int} id_user 
+ * @param {int} id_user
  */
 exports.getUserMembershipsWithTeamData = async (id_user) => {
   return await Member.findAll({

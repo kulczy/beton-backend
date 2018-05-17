@@ -52,6 +52,16 @@ exports.getUserByEmail = async (email) => {
 };
 
 /**
+ * Get public user by email
+ * @param {string} email
+ */
+exports.getPublicUserByEmail = async (email) => {
+  return await User.findOne({
+    where: { email, is_public: 1 }
+  })
+};
+
+/**
  * Get user by ID
  * @param {int} _id_user
  */

@@ -1,13 +1,39 @@
 const memberCtrl = require('../controllers/member.controller');
+const userCtrl = require('../controllers/user.controller');
 
 /**
  * Add new member
+ * 1. Check if user exist by email
+ * 2. If user exist, check if 'is_public' column is true
+ * 3. Check if member with given team and user ID's already exist
  */
 exports.memberInsert = async (req, res) => {
   try {
-    const newMember = await memberCtrl.insertMember(req.body);
-    res.status(200).send(newMember);
+    let member = [];
+    const user = await userCtrl.getPublicUserByEmail(req.body.email);
+    if (user) {
+      member = await memberCtrl.findOrCreateMember(
+        user._id_user,
+        req.body.id_team
+      );
+    }
+
+    let msg = {};
+    if (!member.length) {
+      msg.msg = 'No user found';
+    }
+    if (member.length && !member[1]) {
+      msg.msg = 'The user is already member of the team';
+      msg.member = member[0];
+    }
+    if (member.length && member[1]) {
+      msg.msg = 'The user has been added';
+      msg.member = member[0];
+    }
+
+    res.status(200).send(msg);
   } catch (err) {
+    console.log(err);
     res.status(400).send(err);
   }
 };
@@ -56,7 +82,9 @@ exports.membershipGet = async (req, res) => {
  */
 exports.membershipGetFull = async (req, res) => {
   try {
-    const member = await memberCtrl.getUserMembershipsWithTeamData(req.params._id_user);
+    const member = await memberCtrl.getUserMembershipsWithTeamData(
+      req.params._id_user
+    );
     res.status(200).send({ resp: member });
   } catch (err) {
     res.status(400).send(err);
@@ -93,7 +121,7 @@ exports.is = {
     memberStatus(req, res, next, {
       id_user: req.auth._id_user,
       queryTeamBy: '_id_team',
-      gueryTeamValue: req.params._id_team || req.body.id_team,
+      gueryTeamValue: req.params._id_team || req.body.id_team || req.query.id_team,
       question: 'is_member'
     });
   },
@@ -128,25 +156,25 @@ exports.is = {
     });
   },
 
-    // Get is_creator status by ID
-    creatorByID: (req, res, next) => {
-      memberStatus(req, res, next, {
-        id_user: req.auth._id_user,
-        queryTeamBy: '_id_team',
-        gueryTeamValue: req.params._id_team || req.body.id_team,
-        question: 'is_creator'
-      });
-    },
-  
-    // Get is_creator status by URL
-    creatorByURL: (req, res, next) => {
-      memberStatus(req, res, next, {
-        id_user: req.auth._id_user,
-        queryTeamBy: 'url',
-        gueryTeamValue: req.params.url,
-        question: 'is_creator'
-      });
-    },
+  // Get is_creator status by ID
+  creatorByID: (req, res, next) => {
+    memberStatus(req, res, next, {
+      id_user: req.auth._id_user,
+      queryTeamBy: '_id_team',
+      gueryTeamValue: req.params._id_team || req.body.id_team,
+      question: 'is_creator'
+    });
+  },
+
+  // Get is_creator status by URL
+  creatorByURL: (req, res, next) => {
+    memberStatus(req, res, next, {
+      id_user: req.auth._id_user,
+      queryTeamBy: 'url',
+      gueryTeamValue: req.params.url,
+      question: 'is_creator'
+    });
+  },
 
   // Return object instead go next() in express middleware
   membership: (req, res, next) => {
