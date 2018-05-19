@@ -31,14 +31,14 @@ const mUser = require('./middleware/user.mid');
 router.route('/').get((req, res) => res.status(200).send('Elo world! :D')); // Index
 
 router.route('/team').post(mUser.isLoggedIn, mTeam.teamInsert); // Add new team
-router.route('/team/:_id_team').patch(mUser.isLoggedIn, mMember.is.creatorByID, mTeam.teamUpdate); // Update team
-router.route('/team/:_id_team').delete(mUser.isLoggedIn, mMember.is.creatorByID, mTeam.teamDelete); // Delete team
+router.route('/team/:_id_team').patch(mUser.isLoggedIn, mMember.is.adminByID, mTeam.teamUpdate); // Update team
+router.route('/team/:_id_team').delete(mUser.isLoggedIn, mMember.is.adminByID, mTeam.teamDelete); // Delete team
 router.route('/team/:_id_team').get(mUser.isLoggedIn, mMember.is.memberByID, mTeam.teamGet); // Get basic team by ID
 router.route('/full_team/:url').get(mUser.isLoggedIn, mMember.is.memberByURL, mTeam.teamFullGet); // Get full team data by URL
 
 router.route('/member').post(mUser.isLoggedIn, mMember.is.memberByID, mMember.memberInsert); // Add new member
-router.route('/member/:_id_member').patch(mUser.isLoggedIn, mMember.memberUpdate); // Update member status
-router.route('/member/:_id_member').delete(mUser.isLoggedIn, mMember.is.memberByID, mMember.memberDelete); // Delete membership
+router.route('/member/:_id_member').patch(mUser.isLoggedIn, mMember.is.memberAnyByID, mMember.memberUpdate); // Update member status
+router.route('/member').delete(mUser.isLoggedIn, mMember.is.memberAnyByID, mMember.memberDelete); // Delete membership
 
 router.route('/membership/:_id_user').get(mUser.isLoggedIn, mUser.isOwner, mMember.membershipGet); // Get all user membership
 router.route('/membershipfull/:_id_user').get(mUser.isLoggedIn, mUser.isOwner, mMember.membershipGetFull); // Get all user membership with team data

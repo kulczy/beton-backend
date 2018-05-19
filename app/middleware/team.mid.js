@@ -8,6 +8,7 @@ exports.teamInsert = async (req, res) => {
   try {
     const newTeam = await teamCtrl.insertTeam(req.body);
     const newMember = await memberCtrl.insertMember({
+      join_at: new Date(),
       id_team: newTeam._id_team,
       id_user: req.auth._id_user,
       is_member: 1,

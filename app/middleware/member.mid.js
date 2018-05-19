@@ -14,7 +14,8 @@ exports.memberInsert = async (req, res) => {
     if (user) {
       member = await memberCtrl.findOrCreateMember(
         user._id_user,
-        req.body.id_team
+        req.body.id_team,
+        req.body.inviting_id
       );
     }
 
@@ -43,6 +44,9 @@ exports.memberInsert = async (req, res) => {
  */
 exports.memberUpdate = async (req, res) => {
   try {
+    if ('join_at' in req.body && req.body.join_at == 1) {
+      req.body.join_at = new Date()
+    }
     const member = await memberCtrl.updateMemberStatus(
       req.params._id_member,
       req.body
@@ -58,7 +62,10 @@ exports.memberUpdate = async (req, res) => {
  */
 exports.memberDelete = async (req, res) => {
   try {
-    const member = await memberCtrl.deleteMember(req.params._id_member);
+    const member = await memberCtrl.deleteMember(
+      req.query.id_user,
+      req.query.id_team
+    );
     res.status(200).send({ resp: member });
   } catch (err) {
     res.status(400).send(err);
@@ -83,9 +90,12 @@ exports.membershipGet = async (req, res) => {
 exports.membershipGetFull = async (req, res) => {
   try {
     const member = await memberCtrl.getUserMembershipsWithTeamData(
-      req.params._id_user
+      req.params._id_user,
+      req.query.is_member,
+      req.query.limit,
+      req.query.offset,
     );
-    res.status(200).send({ resp: member });
+    res.status(200).send({ resp: member.rows, count: member.count });
   } catch (err) {
     res.status(400).send(err);
   }
@@ -97,11 +107,13 @@ exports.membershipGetFull = async (req, res) => {
  */
 const memberStatus = async (req, res, next, data, goNext = true) => {
   try {
+    const questionValue = data.questionValue ? data.questionValue : '1';
     const result = await memberCtrl.getMembershipStatus(
       data.id_user,
       data.queryTeamBy,
       data.gueryTeamValue,
-      data.question
+      data.question,
+      questionValue
     );
     if (result.is) {
       if (goNext) next();
@@ -121,8 +133,21 @@ exports.is = {
     memberStatus(req, res, next, {
       id_user: req.auth._id_user,
       queryTeamBy: '_id_team',
-      gueryTeamValue: req.params._id_team || req.body.id_team || req.query.id_team,
+      gueryTeamValue:
+        req.params._id_team || req.body.id_team || req.query.id_team,
       question: 'is_member'
+    });
+  },
+
+  // Get is_member status by ID
+  memberAnyByID: (req, res, next) => {
+    memberStatus(req, res, next, {
+      id_user: req.auth._id_user,
+      queryTeamBy: '_id_team',
+      gueryTeamValue:
+        req.params._id_team || req.body.id_team || req.query.id_team,
+      question: 'is_member',
+      questionValue: '0, 1'
     });
   },
 

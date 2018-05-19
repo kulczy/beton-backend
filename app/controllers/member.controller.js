@@ -1,5 +1,8 @@
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
+
 const models = require('../models');
-const { Member, Team } = models;
+const { Member, Team, User } = models;
 
 /**
  * Add new member
@@ -16,10 +19,10 @@ exports.insertMember = async (memberData) => {
  * @param {int} id_user
  * @param {int} id_team
  */
-exports.findOrCreateMember = async (id_user, id_team) => {
+exports.findOrCreateMember = async (id_user, id_team, inviting_id) => {
   return await Member.findOrCreate({
     where: { id_user, id_team },
-    defaults: { id_user, id_team }
+    defaults: { id_user, id_team, inviting_id }
   });
 };
 
@@ -33,18 +36,19 @@ exports.findOrCreateMember = async (id_user, id_team) => {
  */
 exports.updateMemberStatus = async (_id_member, memberData) => {
   return await Member.update(memberData, {
-    where: { _id_member, is_creator: 0 }
+    where: { _id_member }
   });
 };
 
 /**
  * Delete membership
- * @param {int} _id_member id of membership
+ * @param {int} id_user
+ * @param {int} id_team
  * Prevent if user is creator
  */
-exports.deleteMember = async (_id_member) => {
+exports.deleteMember = async (id_user, id_team) => {
   return await Member.destroy({
-    where: { _id_member, is_creator: 0 }
+    where: { id_user, id_team }
   });
 };
 
@@ -60,14 +64,27 @@ exports.getUserMemberships = async (id_user) => {
 
 /**
  * Get all user memberships with team data
+ * query by id_user and if is member or not
  * @param {int} id_user
+ * @param {string} is_member
  */
-exports.getUserMembershipsWithTeamData = async (id_user) => {
-  return await Member.findAll({
-    where: { id_user },
-    include: { model: Team },
-    order: [['created_at', 'DESC']]
-  });
+exports.getUserMembershipsWithTeamData = async (
+  id_user,
+  is_member,
+  limit,
+  offset
+) => {
+  const query = {
+    where: { id_user, is_member: { [Op.or]: [0, 1] } },
+    include: [{ model: Team }, { model: User, as: 'inviting_data' }],
+    order: [['join_at', 'DESC'], ['updated_at', 'DESC']]
+  };
+
+  if (is_member) query.where.is_member = [Number(is_member)];
+  if (limit) query.limit = Number(limit);
+  if (offset) query.offset = Number(offset);
+
+  return await Member.findAndCountAll(query);
 };
 
 /**
@@ -76,21 +93,23 @@ exports.getUserMembershipsWithTeamData = async (id_user) => {
  * @param {int} id_user id of the user who wants the access
  * @param {string} queryTeamBy query key,ID or URL
  * @param {string|int} gueryTeamValue value for key
- * @param {string} question what status function shoud check:
- * is_admin or is_member
+ * @param {string} question what status function shoud check
+ * @param {string} questionValue 0 or 1
+ *
  */
 exports.getMembershipStatus = async (
   id_user,
   queryTeamBy,
   gueryTeamValue,
-  question
+  question,
+  questionValue
 ) => {
   const result = await models.sequelizeInstance.query(
     `SELECT member.is_member 
      FROM team INNER JOIN member ON team._id_team = member.id_team 
      WHERE member.id_user = ${id_user} 
      AND team.${queryTeamBy} = "${gueryTeamValue}" 
-     AND member.${question} = 1`,
+     AND member.${question} IN (${questionValue})`,
     { type: models.sequelizeInstance.QueryTypes.SELECT }
   );
   return result.length ? { is: 1 } : { is: 0 };
