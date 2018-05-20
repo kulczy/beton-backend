@@ -1,4 +1,5 @@
 const userCtrl = require('../controllers/user.controller');
+const memberCtrl = require('../controllers/member.controller');
 const jwt = require('../utils/jwt');
 
 /**
@@ -30,8 +31,14 @@ exports.userUpdate = async (req, res) => {
  */
 exports.userDelete = async (req, res) => {
   try {
-    const user = await userCtrl.deleteUser(req.params._id_user);
-    res.status(200).send({ resp: user });
+    const resp = { deleted: false };
+    const userTeams = await memberCtrl.getUserMemberships(req.params._id_user, true);
+    if (!userTeams.length) {
+      const user = await userCtrl.deleteUser(req.params._id_user);
+      resp.deleted = true;
+      resp.user = user;
+    }
+    res.status(200).send(resp);
   } catch (err) {
     res.status(400).send(err);
   }
@@ -43,6 +50,18 @@ exports.userDelete = async (req, res) => {
 exports.userGetByEmail = async (req, res) => {
   try {
     const user = await userCtrl.getUserByEmail(req.params.email);
+    res.status(200).send(user);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+};
+
+/**
+ * Get user by ID
+ */
+exports.userGetByID = async (req, res) => {
+  try {
+    const user = await userCtrl.getUserByID(req.params._id_user);
     res.status(200).send(user);
   } catch (err) {
     res.status(400).send(err);

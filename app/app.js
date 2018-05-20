@@ -54,6 +54,7 @@ router.route('/type/:_id_type').delete(mUser.isLoggedIn, mType.typeDelete); // D
 // router.route('/user').post(mUser.userInsert); // Add new user
 router.route('/user/:_id_user').patch(mUser.isLoggedIn, mUser.isOwner, mUser.userUpdate); // Update user data
 router.route('/user/:_id_user').delete(mUser.isLoggedIn, mUser.isOwner, mUser.userDelete); // Delete user
+router.route('/user/:_id_user').get(mUser.isLoggedIn, mUser.isOwner, mUser.userGetByID); // Get user by ID
 router.route('/user/:email').get(mUser.isLoggedIn, mUser.userGetByEmail); // Get user by email
 
 router.route('/utils/member_status').get(mMember.is.membership); // Check if user is team member by URL
