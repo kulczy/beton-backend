@@ -57,10 +57,17 @@ exports.deleteMember = async (id_user, id_team) => {
  * @param {int} id_user
  * @param {boolean} is_admin if true, query only membership
  * where user is admin
+ * @param {boolean} is_creator if true, query only membership
+ * where user is creator
  */
-exports.getUserMemberships = async (id_user, is_admin = null) => {
+exports.getUserMemberships = async (
+  id_user,
+  is_admin = null,
+  is_creator = null
+) => {
   const query = { where: { id_user } };
   if (is_admin) query.where.is_admin = 1;
+  if (is_creator) query.where.is_creator = 1;
   return await Member.findAll(query);
 };
 

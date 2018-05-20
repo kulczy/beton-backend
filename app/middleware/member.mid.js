@@ -45,7 +45,7 @@ exports.memberInsert = async (req, res) => {
 exports.memberUpdate = async (req, res) => {
   try {
     if ('join_at' in req.body && req.body.join_at == 1) {
-      req.body.join_at = new Date()
+      req.body.join_at = new Date();
     }
     const member = await memberCtrl.updateMemberStatus(
       req.params._id_member,
@@ -93,9 +93,26 @@ exports.membershipGetFull = async (req, res) => {
       req.params._id_user,
       req.query.is_member,
       req.query.limit,
-      req.query.offset,
+      req.query.offset
     );
     res.status(200).send({ resp: member.rows, count: member.count });
+  } catch (err) {
+    res.status(400).send(err);
+  }
+};
+
+/**
+ * Count all user creator memberships
+ */
+exports.membershipCreatorCount = async (req, res) => {
+  try {
+    const member = await memberCtrl.getUserMemberships(
+      req.params._id_user,
+      null,
+      true
+    );
+    const canCreate = member.length < 6 ? true : false;
+    res.status(200).send({ resp: canCreate });
   } catch (err) {
     res.status(400).send(err);
   }

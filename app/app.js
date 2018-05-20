@@ -42,6 +42,7 @@ router.route('/member').delete(mUser.isLoggedIn, mMember.is.memberAnyByID, mMemb
 
 router.route('/membership/:_id_user').get(mUser.isLoggedIn, mUser.isOwner, mMember.membershipGet); // Get all user membership
 router.route('/membershipfull/:_id_user').get(mUser.isLoggedIn, mUser.isOwner, mMember.membershipGetFull); // Get all user membership with team data
+router.route('/membershipcreatorcount/:_id_user').get(mUser.isLoggedIn, mUser.isOwner, mMember.membershipCreatorCount); // Count user teams he is created
 
 router.route('/game').post(mUser.isLoggedIn, mMember.is.memberByID, mGame.gameInsert); // Add new game
 router.route('/game/:_id_game').patch(mUser.isLoggedIn, mMember.is.memberByID, mGame.gameUpdate); // Update game data
