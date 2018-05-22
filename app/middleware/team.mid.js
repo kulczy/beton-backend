@@ -61,7 +61,7 @@ exports.teamGet = async (req, res) => {
  * Get full team data by URL
  */
 exports.teamFullGet = async (req, res) => {
-  try {
+  try {    
     const team = await teamCtrl.getFullTeam(req.params.url);
     res.status(200).send(team);
   } catch (err) {
