@@ -61,12 +61,37 @@ exports.teamGet = async (req, res) => {
  * Get full team data by URL
  */
 exports.teamFullGet = async (req, res) => {
-  try {    
-    const team = await teamCtrl.getFullTeam(req.params.url);
+  try {
+    let team = await teamCtrl.getFullTeam(req.params.url);
+    team = remodelTeamData(team); // Rearange team data
     res.status(200).send(team);
   } catch (err) {
     res.status(400).send(err);
   }
 };
 
+function remodelTeamData(team) {
+  // Create plain JSON from team
+  const plainTeam = team.get({ plain: true });
 
+  // Empty types object
+  const newTypes = {};
+
+  // Create member array
+  plainTeam.members.forEach((member) => {
+    newTypes[member.user._id_user] = {};
+  });
+
+  // Add types to members
+  plainTeam.types.forEach((type) => {
+    newTypes[type.id_user][type.id_game] = type;
+  });
+
+  // Remove useless data from team object
+  delete plainTeam.types;
+
+  // Add new types to team object
+  plainTeam.types = newTypes;
+
+  return plainTeam;
+}

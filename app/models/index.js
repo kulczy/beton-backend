@@ -12,6 +12,7 @@ Team.hasMany(Member, { foreignKey: 'id_team' });
 Member.belongsTo(User, { foreignKey: 'id_user' });
 Team.hasMany(Game, { foreignKey: 'id_team' });
 Game.hasMany(Type, { foreignKey: 'id_game' });
+Team.hasMany(Type, { foreignKey: 'id_team' });
 
 // Models associations - connect team data to member
 Member.belongsTo(Team, { foreignKey: 'id_team' });

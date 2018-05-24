@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     created_at: { type: DataTypes.DATE },
     updated_at: { type: DataTypes.DATE },
     facebook_id: { type: DataTypes.STRING, unique: true, validate: { notEmpty: true } },
-    username: { type: DataTypes.STRING, validate: { notEmpty: true, len: [3,10] } },
+    username: { type: DataTypes.STRING, validate: { notEmpty: true, len: [3,25] } },
     email: { type: DataTypes.STRING, unique: true, validate: { isEmail: true } },
     photo: { type: DataTypes.STRING },
     is_public: { type: DataTypes.INTEGER, defaultValue: 1 }

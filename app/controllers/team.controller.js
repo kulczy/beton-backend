@@ -49,16 +49,22 @@ exports.getTeam = async (_id_team) => {
 exports.getFullTeam = async (url) => {
   return await Team.findOne({
     where: { url },
+    order: [
+      [Game, 'created_at', 'DESC'],
+      [Member, 'join_at', 'ASC']
+    ],
     include: [
+      {
+        model: Type
+      },
       {
         model: Member,
         include: [{ model: User }]
       },
       {
-        model: Game,
-        include: [{ model: Type }]
+        model: Game,        
+        // include: [{ model: Type }]    
       }
-    ]
+    ],    
   });
 };
-

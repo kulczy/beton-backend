@@ -22,6 +22,7 @@ exports.userUpdate = async (req, res) => {
     const user = await userCtrl.updateUser(req.params._id_user, req.body);
     res.status(200).send({ resp: user });
   } catch (err) {
+    console.log(err);
     res.status(400).send(err);
   }
 };
