@@ -34,7 +34,7 @@ exports.gameDelete = async (req, res) => {
   try {
     const game = await gameCtrl.deleteGame(
       req.params._id_game,
-      req.body.id_team
+      req.query.id_team
     );
     res.status(200).send({ resp: game });
   } catch (err) {
