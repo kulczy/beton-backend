@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     id_team: { type: DataTypes.INTEGER, validate: { notEmpty: true } },
     id_game: { type: DataTypes.INTEGER, validate: { notEmpty: true } },
     id_user: { type: DataTypes.INTEGER, validate: { notEmpty: true } },
+    id_member: { type: DataTypes.INTEGER, validate: { notEmpty: true } },
     type_a: { type: DataTypes.INTEGER, validate: { notEmpty: true } },
     type_b: { type: DataTypes.INTEGER, validate: { notEmpty: true } }
   });

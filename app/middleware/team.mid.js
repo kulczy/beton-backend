@@ -82,9 +82,11 @@ function remodelTeamData(team) {
     newTypes[member.user._id_user] = {};
   });
 
-  // Add types to members
+  // Add types to members if member exist
   plainTeam.types.forEach((type) => {
-    newTypes[type.id_user][type.id_game] = type;
+    if (newTypes[type.id_user]) {
+      newTypes[type.id_user][type.id_game] = type;
+    }
   });
 
   // Remove useless data from team object
