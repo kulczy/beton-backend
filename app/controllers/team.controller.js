@@ -50,7 +50,7 @@ exports.getFullTeam = async (url) => {
   return await Team.findOne({
     where: { url },
     order: [
-      [Game, 'created_at', 'DESC'],
+      [Game, 'close_at', 'DESC'],
       [Member, 'join_at', 'ASC']
     ],
     include: [
