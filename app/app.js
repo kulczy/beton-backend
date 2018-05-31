@@ -4,13 +4,20 @@ const cors = require('cors');
 const Sequelize = require('sequelize');
 const passport = require('passport');
 const FacebookTokenStrategy = require('passport-facebook-token');
+const socketIO = require('socket.io');
+const http = require('http');
 
 // App and middleware
 const app = express();
+const server = http.createServer(app);
+const io = socketIO(server);
 app.disable('x-powered-by');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors({ origin: process.env.FRONT_CORS_PATH }));
+
+// Start socket
+require('./socket.js')(io, app);
 
 // Facebook auth
 const fbTokenStrategy = require('./utils/facebook-token-strategy');
@@ -61,4 +68,4 @@ router.route('/user/:email').get(mUser.isLoggedIn, mUser.userGetByEmail); // Get
 router.route('/utils/member_status').get(mMember.is.membership); // Check if user is team member by URL
 router.route('/utils/auth').get(passport.authenticate('facebook-token', { session: false }), mUser.userAuth); // User auth
 
-module.exports = app;
+module.exports = server;

@@ -14,8 +14,8 @@ exports.teamInsert = async (req, res) => {
       is_member: 1,
       is_admin: 1,
       is_creator: 1
-    });
-    res.status(200).send({ newTeam, newMember });
+    });  
+    res.status(200).send({ newTeam, newMember });    
   } catch (err) {
     res.status(400).send(err);
   }

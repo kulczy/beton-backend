@@ -30,6 +30,24 @@ exports.memberInsert = async (req, res) => {
     if (member.length && member[1]) {
       msg.msg = 'The user has been added';
       msg.member = member[0];
+
+      // Socket: emit to member who was invite to the team and to the team
+      const newMember = await memberCtrl.getUserMembershipsWithTeamData(
+        member[0].id_user,
+        0,
+        1,
+        null,
+        member[0]._id_member
+      );
+      const newMemberWithUserData = await memberCtrl.getMemberWithUserData(
+        member[0]._id_member
+      );
+      req.ioMember
+        .in(`ioMember_${user._id_user}`)
+        .emit('memberAdded', newMember.rows[0]);
+      req.ioTeam
+        .in(`ioTeam_${newMember.rows[0].id_team}`)
+        .emit('memberAdded', newMemberWithUserData);
     }
 
     res.status(200).send(msg);
@@ -51,7 +69,18 @@ exports.memberUpdate = async (req, res) => {
       req.params._id_member,
       req.body
     );
-    res.status(200).send({ resp: member });
+    // Get new upadted member data
+    const newMember = await memberCtrl.findMember(req.params._id_member);
+
+    // Sockets:
+    req.ioMember
+      .in(`ioMember_${newMember.id_user}`)
+      .emit('memberUpdated', newMember);
+    req.ioTeam
+      .in(`ioTeam_${newMember.id_team}`)
+      .emit('memberUpdated', newMember);
+
+    res.status(200).send({ resp: newMember });
   } catch (err) {
     res.status(400).send(err);
   }
@@ -66,6 +95,16 @@ exports.memberDelete = async (req, res) => {
       req.query.id_user,
       req.query.id_team
     );
+    // Socket: emit to team
+    req.ioTeam
+      .in(`ioTeam_${req.query.id_team}`)
+      .emit('memberDelete', { id_user: req.query.id_user });
+
+    // Socket: emit to user who memberships delete
+    req.ioMember
+      .in(`ioMember_${req.query.id_user}`)
+      .emit('memberDelete', { id_team: req.query.id_team });
+
     res.status(200).send({ resp: member });
   } catch (err) {
     res.status(400).send(err);

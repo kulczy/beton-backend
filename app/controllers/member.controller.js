@@ -15,7 +15,17 @@ exports.insertMember = async (memberData) => {
 };
 
 /**
- * Find member or create if exist
+ * Find single member by ID
+ * @param {number} _id_member 
+ */
+exports.findMember = async (_id_member) => {
+  return await Member.findOne({
+    where: { _id_member }
+  });
+}
+
+/**
+ * Find member or create if not exist
  * @param {int} id_user
  * @param {int} id_team
  */
@@ -72,6 +82,16 @@ exports.getUserMemberships = async (
 };
 
 /**
+ * Get member with user data by member ID
+ * @param {number} _id_member 
+ */
+exports.getMemberWithUserData = async (_id_member) => {
+  const query = { where: { _id_member } };
+  query.include = [{ model: User }];
+  return await Member.findOne(query);
+};
+
+/**
  * Get all user memberships with team data
  * query by id_user and if is member or not
  * @param {int} id_user
@@ -81,7 +101,8 @@ exports.getUserMembershipsWithTeamData = async (
   id_user,
   is_member,
   limit,
-  offset
+  offset,
+  _id_member
 ) => {
   const query = {
     where: { id_user, is_member: { [Op.or]: [0, 1] } },
@@ -92,6 +113,7 @@ exports.getUserMembershipsWithTeamData = async (
   if (is_member) query.where.is_member = [Number(is_member)];
   if (limit) query.limit = Number(limit);
   if (offset) query.offset = Number(offset);
+  if (_id_member) query.where._id_member = [Number(_id_member)];
 
   return await Member.findAndCountAll(query);
 };

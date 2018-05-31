@@ -24,7 +24,8 @@
     "mysql2": "^1.5.3",
     "passport": "^0.4.0",
     "passport-facebook-token": "^3.3.0",
-    "sequelize": "^4.37.7"
+    "sequelize": "^4.37.7",
+    "socket.io": "^2.1.1"
   },
   "devDependencies": {
     "dotenv": "^5.0.1",
