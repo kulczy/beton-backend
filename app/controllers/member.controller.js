@@ -25,6 +25,16 @@ exports.findMember = async (_id_member) => {
 }
 
 /**
+ * Find all members of team
+ * @param {number} id_team 
+ */
+exports.findMembersByTeamID = async (id_team) => {
+  return await Member.findAll({
+    where: { id_team }
+  });
+}
+
+/**
  * Find member or create if not exist
  * @param {int} id_user
  * @param {int} id_team

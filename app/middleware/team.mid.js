@@ -38,7 +38,20 @@ exports.teamUpdate = async (req, res) => {
  */
 exports.teamDelete = async (req, res) => {
   try {
+    const teamMembers = await memberCtrl.findMembersByTeamID(req.params._id_team);
     const remove = await teamCtrl.deleteTeam(req.params._id_team);
+
+    // Sockets: emit to all team members to remove memberships
+    teamMembers.forEach(m => {
+      req.ioMember
+        .in(`ioMember_${m.id_user}`)
+        .emit('memberDelete', { id_team: req.params._id_team });
+    });
+    // Sockets: emit to team
+    req.ioTeam
+      .in(`ioTeam_${req.params._id_team}`)
+      .emit('teamDelete', null);
+
     res.status(200).send({ resp: remove });
   } catch (err) {
     res.status(400).send(err);

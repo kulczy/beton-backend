@@ -32,14 +32,31 @@ exports.userUpdate = async (req, res) => {
  */
 exports.userDelete = async (req, res) => {
   try {
+    // Response object
     const resp = { deleted: false };
-    const userTeams = await memberCtrl.getUserMemberships(req.params._id_user, true);
-    if (!userTeams.length) {
+
+    // Get all user memberships
+    const userMemberships = await memberCtrl.getUserMemberships(req.params._id_user);
+
+    // Count teams that the user is admin
+    const isAdmin = (userMemberships.filter(m => m.is_admin === 1)).length;
+
+    // Delete user if is not admin in any team
+    if (isAdmin === 0) {
       const user = await userCtrl.deleteUser(req.params._id_user);
-      resp.deleted = true;
       resp.user = user;
+      resp.deleted = true;
+
+      userMemberships.forEach(m => {
+        req.ioTeam
+          .in(`ioTeam_${m.id_team}`)
+          .emit('memberDelete', { id_user: req.params._id_user });
+      });
     }
+
+    // Send response
     res.status(200).send(resp);
+
   } catch (err) {
     res.status(400).send(err);
   }
