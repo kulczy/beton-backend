@@ -2,6 +2,16 @@ const models = require('../models');
 const { Type } = models;
 
 /**
+ * Get type by ID
+ * @param {number} _id_type 
+ */
+exports.getType = async (_id_type) => {
+  return await Type.findOne({
+    where: { _id_type }
+  });
+};
+
+/**
  * Add new type
  * @param {object} typeData object contains all type data:
  * id_team, id_game, id_user, type_a, type_b

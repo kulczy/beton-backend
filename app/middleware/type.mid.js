@@ -9,6 +9,10 @@ exports.typeInsert = async (req, res) => {
       ...req.body,
       id_user: req.auth._id_user
     });
+
+    // Socket: emit to team
+    req.ioTeam.in(`ioTeam_${newType.id_team}`).emit('typeChanged', newType);
+
     res.status(200).send(newType);
   } catch (err) {
     res.status(400).send(err);
@@ -21,7 +25,12 @@ exports.typeInsert = async (req, res) => {
 exports.typeUpdate = async (req, res) => {
   try {
     const type = await typeCtrl.updateType(req.params._id_type, req.body);
-    res.status(200).send({ resp: type });
+    const freshType = await typeCtrl.getType(req.params._id_type);
+
+    // Socket: emit to team
+    req.ioTeam.in(`ioTeam_${freshType.id_team}`).emit('typeChanged', freshType);
+
+    res.status(200).send({ resp: type, freshType });
   } catch (err) {
     res.status(400).send(err);
   }
