@@ -14,8 +14,8 @@ exports.teamInsert = async (req, res) => {
       is_member: 1,
       is_admin: 1,
       is_creator: 1
-    });  
-    res.status(200).send({ newTeam, newMember });    
+    });
+    res.status(200).send({ newTeam, newMember });
   } catch (err) {
     res.status(400).send(err);
   }
@@ -38,19 +38,19 @@ exports.teamUpdate = async (req, res) => {
  */
 exports.teamDelete = async (req, res) => {
   try {
-    const teamMembers = await memberCtrl.findMembersByTeamID(req.params._id_team);
+    const teamMembers = await memberCtrl.findMembersByTeamID(
+      req.params._id_team
+    );
     const remove = await teamCtrl.deleteTeam(req.params._id_team);
 
     // Sockets: emit to all team members to remove memberships
-    teamMembers.forEach(m => {
+    teamMembers.forEach((m) => {
       req.ioMember
         .in(`ioMember_${m.id_user}`)
         .emit('memberDelete', { id_team: req.params._id_team });
     });
     // Sockets: emit to team
-    req.ioTeam
-      .in(`ioTeam_${req.params._id_team}`)
-      .emit('teamDelete', null);
+    req.ioTeam.in(`ioTeam_${req.params._id_team}`).emit('teamDelete', null);
 
     res.status(200).send({ resp: remove });
   } catch (err) {
@@ -77,6 +77,7 @@ exports.teamFullGet = async (req, res) => {
   try {
     let team = await teamCtrl.getFullTeam(req.params.url);
     team = remodelTeamData(team); // Rearange team data
+    team = sortGames(team); // Sort games
     res.status(200).send(team);
   } catch (err) {
     res.status(400).send(err);
@@ -109,4 +110,34 @@ function remodelTeamData(team) {
   plainTeam.types = newTypes;
 
   return plainTeam;
+}
+
+function sortGames(team) {
+  const newTeam = Object.assign({}, team);
+  const newGames = [];
+  const gamesOpen = [];
+  const gamesClosed = [];
+
+  // Split games to open and slode
+  newTeam.games.forEach((g) => {
+    if (new Date(g.close_at).getTime() > new Date().getTime()) {
+      gamesOpen.push(g);
+    } else {
+      gamesClosed.push(g);
+    }
+  });
+
+  // Sort open games
+  gamesOpen.sort(
+    (a, b) => new Date(a.close_at).getTime() - new Date(b.close_at).getTime()
+  );
+
+  // Sort closed games
+  gamesClosed.sort(
+    (a, b) => new Date(b.close_at).getTime() - new Date(a.close_at).getTime()
+  );
+
+  newTeam.games = newGames.concat(gamesOpen, gamesClosed);
+
+  return newTeam;
 }
