@@ -22,14 +22,17 @@ exports.memberInsert = async (req, res) => {
     let msg = {};
     if (!member.length) {
       msg.msg = 'No user found';
+      msg.success = false;
     }
     if (member.length && !member[1]) {
       msg.msg = 'The user is already member of the team';
       msg.member = member[0];
+      msg.success = false;
     }
     if (member.length && member[1]) {
       msg.msg = 'The user has been added';
       msg.member = member[0];
+      msg.success = true;
 
       // Socket: emit to member who was invite to the team and to the team
       const newMember = await memberCtrl.getUserMembershipsWithTeamData(
