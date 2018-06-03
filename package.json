@@ -9,7 +9,7 @@
     "npm": ">=5.6.0"
   },
   "scripts": {
-    "start": "node app/index.js",
+    "start": "node -r dotenv/config app/index.js",
     "dev": "nodemon -r dotenv/config app/index.js",
     "test": "jest"
   },
