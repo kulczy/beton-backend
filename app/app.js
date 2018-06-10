@@ -43,6 +43,8 @@ router.route('/team/:_id_team').delete(mUser.isLoggedIn, mMember.is.adminByID, m
 router.route('/team/:_id_team').get(mUser.isLoggedIn, mMember.is.memberByID, mTeam.teamGet); // Get basic team by ID
 router.route('/full_team/:url').get(mUser.isLoggedIn, mMember.is.memberByURL, mTeam.teamFullGet); // Get full team data by URL
 
+router.route('/statistics/:url').get(mUser.isLoggedIn, mMember.is.memberByURL, mTeam.teamStatistics); // Get full team statistics
+
 router.route('/member').post(mUser.isLoggedIn, mMember.is.memberByID, mMember.memberInsert); // Add new member
 router.route('/member/:_id_member').patch(mUser.isLoggedIn, mMember.is.memberAnyByID, mMember.memberUpdate); // Update member status
 router.route('/member').delete(mUser.isLoggedIn, mMember.is.memberAnyByID, mMember.memberDelete); // Delete membership

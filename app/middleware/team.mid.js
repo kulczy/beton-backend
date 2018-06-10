@@ -141,3 +141,48 @@ function sortGames(team) {
 
   return newTeam;
 }
+
+// Get team statistics
+exports.teamStatistics = async (req, res) => {
+  try {
+    const team = await teamCtrl.getFullTeam(req.params.url);
+    const plainTeam = team.get({ plain: true });
+
+    // Create statistics array with members   
+    const statistics = []; 
+    plainTeam.members.forEach(m => {
+      if (m.is_member === 1) {
+        statistics.push({
+          id_user: m.user._id_user,
+          username: m.user.username,
+          photo: m.user.photo,
+          games: 0,
+          wins: 0
+        });
+      }
+    });
+
+    // Fill statistics
+    const closeGames = plainTeam.types.forEach(t => {
+      const game = plainTeam.games.find(g => g._id_game === t.id_game && new Date(g.close_at).getTime() < new Date().getTime());   
+      if (game) {
+        const userIndex = statistics.findIndex(m => m.id_user === t.id_user);
+        if (userIndex !== -1) {
+          statistics[userIndex].games = statistics[userIndex].games + 1;
+          statistics[userIndex].wins = t.type_a === game.score_a && t.type_b === game.score_b ? statistics[userIndex].wins + 1 : statistics[userIndex].wins;
+        }
+      }
+    });
+
+    // Extra info
+    const info = {
+      totalGames: plainTeam.games.length,
+      totalMembers: statistics.length,
+      created_at: plainTeam.created_at
+    }
+
+    res.status(200).send({ statistics, info });
+  } catch (err) {
+    res.status(400).send(err);
+  }
+};
