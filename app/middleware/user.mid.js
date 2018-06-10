@@ -80,7 +80,7 @@ exports.userGetByEmail = async (req, res) => {
 exports.userGetByID = async (req, res) => {
   try {
     const user = await userCtrl.getUserByID(req.params._id_user);
-    res.status(200).send(user);
+    res.status(200).send({ user, serverTime: new Date()});
   } catch (err) {
     res.status(400).send(err);
   }

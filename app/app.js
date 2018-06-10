@@ -67,5 +67,6 @@ router.route('/user/:email').get(mUser.isLoggedIn, mUser.userGetByEmail); // Get
 
 router.route('/utils/member_status').get(mMember.is.membership); // Check if user is team member by URL
 router.route('/utils/auth').get(passport.authenticate('facebook-token', { session: false }), mUser.userAuth); // User auth
+router.route('/utils/time').get(mUser.isLoggedIn, (req, res) => { res.status(200).send({ time: new Date() }); }); // Return servertime
 
 module.exports = server;
