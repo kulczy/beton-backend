@@ -14,7 +14,8 @@ const io = socketIO(server);
 app.disable('x-powered-by');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors({ origin: process.env.FRONT_CORS_PATH }));
+// app.use(cors({ origin: process.env.FRONT_CORS_PATH }));
+app.use(cors());
 
 // Start socket
 require('./socket.js')(io, app);
