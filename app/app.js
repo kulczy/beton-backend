@@ -30,6 +30,9 @@ app.use(express.static('public'));
 app.get('/', function(req, res) {
   res.sendFile('/public/index.html', { root: '.' });
 });
+app.get('/app', function(req, res) {
+  res.sendFile('/public/index.html', { root: '.' });
+});
 app.get('/app/*', function(req, res) {
   res.sendFile('/public/index.html', { root: '.' });
 });
