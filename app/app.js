@@ -26,6 +26,7 @@ app.use(passport.initialize());
 passport.use(new FacebookTokenStrategy(fbTokenStrategy.config, fbTokenStrategy.func));
 
 // Static sites
+app.use(express.static('public'));
 app.get('/', function(req, res) {
   res.sendFile('/public/index.html', { root: '.' });
 });
