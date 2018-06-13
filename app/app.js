@@ -25,6 +25,11 @@ const fbTokenStrategy = require('./utils/facebook-token-strategy');
 app.use(passport.initialize());
 passport.use(new FacebookTokenStrategy(fbTokenStrategy.config, fbTokenStrategy.func));
 
+// Static sites
+app.get('/', function(req, res) {
+  res.sendFile('/public/index.html', { root: '.' });
+});
+
 // Router
 const router = express.Router();
 app.use('/v1/api', router);
