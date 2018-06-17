@@ -36,3 +36,13 @@ exports.deleteGame = async (_id_game, id_team) => {
     where: { _id_game, id_team }
   });
 };
+
+/**
+ * Get game by ID
+ * @param {int} _id_game 
+ */
+exports.getGame = async (_id_game) => {
+  return await Game.findOne({
+    where: { _id_game }
+  });
+};

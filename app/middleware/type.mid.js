@@ -1,10 +1,14 @@
 const typeCtrl = require('../controllers/type.controller');
+const gameCtrl = require('../controllers/game.controller');
 
 /**
  * Add new type
  */
 exports.typeInsert = async (req, res) => {
-  try {
+  try {    
+    // Throw error if game is close
+    if (await isGameClosed(req.body.id_game)) throw 'Game is closed';
+    
     const newType = await typeCtrl.insertType({
       ...req.body,
       id_user: req.auth._id_user
@@ -23,7 +27,10 @@ exports.typeInsert = async (req, res) => {
  * Update type
  */
 exports.typeUpdate = async (req, res) => {
-  try {
+  try {    
+    // Throw error if game is close
+    if (await isGameClosed(req.body.id_game)) throw 'Game is closed';
+
     const type = await typeCtrl.updateType(req.params._id_type, req.body);
     const freshType = await typeCtrl.getType(req.params._id_type);
 
@@ -47,3 +54,12 @@ exports.typeDelete = async (req, res) => {
     res.status(400).send(err);
   }
 };
+
+/**
+ * Check if game is closed
+ */
+const isGameClosed = async (gameID) => {
+  const game = await gameCtrl.getGame(gameID);
+  const isClose = new Date(game.close_at).getTime() < new Date().getTime() ? true : false;
+  return isClose;
+}
