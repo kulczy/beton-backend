@@ -164,7 +164,12 @@ exports.teamStatistics = async (req, res) => {
 
     // Fill statistics
     const closeGames = plainTeam.types.forEach(t => {
-      const game = plainTeam.games.find(g => g._id_game === t.id_game && new Date(g.close_at).getTime() < new Date().getTime());   
+      const game = plainTeam.games.find(
+        g => g._id_game === t.id_game 
+          && new Date(g.close_at).getTime() < new Date().getTime() 
+          && g.score_a !== null 
+          && g.score_b !== null 
+      );   
       if (game) {
         const userIndex = statistics.findIndex(m => m.id_user === t.id_user);
         if (userIndex !== -1) {
