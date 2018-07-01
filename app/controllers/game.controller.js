@@ -50,6 +50,17 @@ exports.getGame = async (_id_game) => {
 };
 
 /**
+ * Get all games by team ID
+ * @param {int} id_team 
+ */
+exports.getGames = async (id_team) => {
+  return await Game.findAll({
+    where: { id_team },
+    order: [['close_at', 'ASC']]
+  });
+};
+
+/**
  * Get games with types
  * @param {int} id_team 
  * @param {array} exclude 

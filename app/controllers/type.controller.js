@@ -12,6 +12,16 @@ exports.getType = async (_id_type) => {
 };
 
 /**
+ * Get all types by team ID
+ * @param {number} id_team 
+ */
+exports.getTypes = async (id_team) => {
+  return await Type.findAll({
+    where: { id_team }
+  });
+};
+
+/**
  * Add new type
  * @param {object} typeData object contains all type data:
  * id_team, id_game, id_user, type_a, type_b

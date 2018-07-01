@@ -1,6 +1,7 @@
 const teamCtrl = require('../controllers/team.controller');
 const gameCtrl = require('../controllers/game.controller');
 const memberCtrl = require('../controllers/member.controller');
+const typeCtrl = require('../controllers/type.controller');
 const teamDataUtils = require('../utils/team-data');
 
 /**
@@ -128,48 +129,88 @@ exports.teamGetFill = async (req, res) => {
 // Get team statistics
 exports.teamStatistics = async (req, res) => {
   try {
-    const team = await teamCtrl.getFullTeam(req.params.url);
-    const plainTeam = team.get({ plain: true });
+    const team = await teamCtrl.getTeamDataWithMembers(req.params.url); // Get team data
+    const games = await gameCtrl.getGames(team._id_team); // Get all team games
+    const types = await typeCtrl.getTypes(team._id_team); // Get all team types
 
-    // Create statistics array with members   
-    const statistics = []; 
-    plainTeam.members.forEach(m => {
-      if (m.is_member === 1) {
-        statistics.push({
-          id_user: m.user._id_user,
-          username: m.user.username,
-          photo: m.user.photo,
-          games: 0,
-          wins: 0
+    // Create members statistics
+    const statistics = team.members.map((member) => {
+      return {
+        id_user: member.id_user,
+        username: member.user.username,
+        photo: member.user.photo,
+        games: 0,
+        wins: 0,
+        points: 0
+      };
+    });
+
+    // Extend games data by winners and players
+    const extendedGames = games.map((game) => {
+      const plainGame = game.get({ plain: true });
+      const gameTypes = types.filter((type) => type.id_game === plainGame._id_game); // Find types to this game
+      const players = []; // Members whos play this game
+      const winners = []; // Members whos type correct score
+
+      // Fill players and winners if game score exist
+      if (plainGame.score_a !== null && plainGame.score_b !== null) {
+        gameTypes.forEach((type) => {
+          players.push(type.id_user);
+          if (type.type_a === plainGame.score_a && type.type_b === plainGame.score_b) {
+            winners.push(type.id_user);
+          }
         });
       }
+      return { ...plainGame, players, winners };
     });
 
-    // Fill statistics
-    const closeGames = plainTeam.types.forEach(t => {
-      const game = plainTeam.games.find(
-        g => g._id_game === t.id_game 
-          && new Date(g.close_at).getTime() < new Date().getTime() 
-          && g.score_a !== null 
-          && g.score_b !== null 
-      );   
-      if (game) {
-        const userIndex = statistics.findIndex(m => m.id_user === t.id_user);
-        if (userIndex !== -1) {
-          statistics[userIndex].games = statistics[userIndex].games + 1;
-          statistics[userIndex].wins = t.type_a === game.score_a && t.type_b === game.score_b ? statistics[userIndex].wins + 1 : statistics[userIndex].wins;
-        }
+    // Fill members statistics
+    extendedGames.forEach((game) => {
+      game.players.forEach((player) => {
+        const member = statistics.find(m => m.id_user === player);
+        if (member) member.games = member.games + 1;
+      });
+      game.winners.forEach((player) => {
+        const member = statistics.find(m => m.id_user === player);
+        if (member) member.wins = member.wins + 1;
+      });
+    });
+
+    // Compute accuracy
+    statistics.map((member) => {
+      member.accuracy = member.games > 0 ? Math.round((member.wins / member.games) * 100) : 0;
+      return member;
+    });
+
+    // Compute points
+    let pts = 0;
+    extendedGames.forEach((game) => {
+      pts = pts + game.players.length;
+      if (game.winners.length) {
+        const currPts = pts / game.winners.length;
+        game.winners.forEach((winner) => {
+          const member = statistics.find(m => m.id_user === winner);
+          if (member) member.points = member.points + currPts;
+        });
+        pts = 0;
       }
     });
 
-    // Extra info
-    const info = {
-      totalGames: plainTeam.games.length,
-      totalMembers: statistics.length,
-      created_at: plainTeam.created_at
-    }
+    // Points minus games
+    statistics.map((member) => {
+      member.points = Number((member.points - games.length).toFixed(1));
+      return member;
+    });
 
-    res.status(200).send({ statistics, info });
+    // Other team stats
+    const info = {
+      totalGames: games.length,
+      openGames: (games.filter(game => game.score_a === null || game.score_b === null)).length,
+      totalMembers: statistics.length,
+      created_at: team.created_at,
+    };
+    
+    res.status(200).send({ info, statistics });
   } catch (err) {
     res.status(400).send(err);
   }
