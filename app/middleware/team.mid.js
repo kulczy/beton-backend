@@ -198,7 +198,7 @@ exports.teamStatistics = async (req, res) => {
 
     // Points minus games
     statistics.map((member) => {
-      member.points = Number((member.points - games.length).toFixed(1));
+      member.points = Number((member.points - member.games).toFixed(1));
       return member;
     });
 
