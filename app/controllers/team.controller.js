@@ -42,6 +42,16 @@ exports.getTeam = async (_id_team) => {
 };
 
 /**
+ * Select team by URL
+ * @param {int} url
+ */
+exports.getTeamByURL = async (url) => {
+  return await Team.findOne({
+    where: { url }
+  });
+};
+
+/**
  * Select full team info by URL
  * with users, games and types
  * @param {string} url
@@ -67,4 +77,29 @@ exports.getFullTeam = async (url) => {
       }
     ],    
   });
+};
+
+/**
+ * Select team info with members by URL
+ * @param {string} url
+ */
+exports.getTeamDataWithMembers = async (url, userData = true) => {
+  const query = {
+    where: { url },
+    order: [
+      [Member, 'join_at', 'ASC']
+    ],
+    include: [
+      {
+        model: Member,
+        // include: [{ model: User }]
+      }
+    ],    
+  };
+
+  if (userData) {
+    query.include[0].include = [{ model: User }];
+  }
+
+  return await Team.findOne(query);
 };

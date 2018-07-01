@@ -1,5 +1,7 @@
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
 const models = require('../models');
-const { Game } = models;
+const { Game, Type } = models;
 
 /**
  * Add new game
@@ -44,5 +46,20 @@ exports.deleteGame = async (_id_game, id_team) => {
 exports.getGame = async (_id_game) => {
   return await Game.findOne({
     where: { _id_game }
+  });
+};
+
+/**
+ * Get games with types
+ * @param {int} id_team 
+ * @param {array} exclude 
+ * @param {int} limit 
+ */
+exports.getGamesWithTypes = async (id_team, exclude = [], limit = 10) => {
+  return await Game.findAll({
+    where: { id_team, _id_game: { [Op.notIn]: exclude } },
+    order: [['close_at', 'DESC']],
+    limit,
+    include: [{ model: Type }], 
   });
 };

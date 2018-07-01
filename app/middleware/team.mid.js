@@ -1,5 +1,7 @@
 const teamCtrl = require('../controllers/team.controller');
+const gameCtrl = require('../controllers/game.controller');
 const memberCtrl = require('../controllers/member.controller');
+const teamDataUtils = require('../utils/team-data');
 
 /**
  * Add new team
@@ -76,71 +78,52 @@ exports.teamGet = async (req, res) => {
 exports.teamFullGet = async (req, res) => {
   try {
     let team = await teamCtrl.getFullTeam(req.params.url);
-    team = remodelTeamData(team); // Rearange team data
-    team = sortGames(team); // Sort games
+    const plainTeam = team.get({ plain: true });
+    team = teamDataUtils.remodelTeamData(plainTeam); // Rearange team data
+    team = teamDataUtils.sortGames(team); // Sort games
     res.status(200).send(team);
   } catch (err) {
     res.status(400).send(err);
   }
 };
 
-function remodelTeamData(team) {
-  // Create plain JSON from team
-  const plainTeam = team.get({ plain: true });
+/**
+ * Get partial team data (name etc., and mambers)
+ */
+exports.teamGetBasic = async (req, res) => {
+  try {
+    let team = await teamCtrl.getTeamDataWithMembers(req.params.url);
+    let games = await gameCtrl.getGamesWithTypes(team._id_team);
+    let plainTeam = team.get({ plain: true });
 
-  // Empty types object
-  const newTypes = {};
+    plainTeam = Object.assign({}, plainTeam, teamDataUtils.takeOutTypes(games)); // Teka out types from games
+    plainTeam = teamDataUtils.remodelTeamData(plainTeam); // Rearange team data
+    plainTeam = teamDataUtils.sortGames(plainTeam); // Sort games
 
-  // Create member array
-  plainTeam.members.forEach((member) => {
-    newTypes[member.user._id_user] = {};
-  });
+    res.status(200).send(plainTeam);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+};
 
-  // Add types to members if member exist
-  plainTeam.types.forEach((type) => {
-    if (newTypes[type.id_user]) {
-      newTypes[type.id_user][type.id_game] = type;
-    }
-  });
+/**
+ * Get portion of games for team
+ */
+exports.teamGetFill = async (req, res) => {
+  try {
+    let team = await teamCtrl.getTeamDataWithMembers(req.params.url, false);
+    let games = await gameCtrl.getGamesWithTypes(team._id_team, JSON.parse(req.query.exclude));
+    let plainTeam = team.get({ plain: true });
 
-  // Remove useless data from team object
-  delete plainTeam.types;
+    plainTeam = Object.assign({}, { members: plainTeam.members }, teamDataUtils.takeOutTypes(games)); // Teka out types from games
+    plainTeam = teamDataUtils.remodelTeamData(plainTeam); // Rearange team data
+    delete plainTeam.members;
 
-  // Add new types to team object
-  plainTeam.types = newTypes;
-
-  return plainTeam;
-}
-
-function sortGames(team) {
-  const newTeam = Object.assign({}, team);
-  const newGames = [];
-  const gamesOpen = [];
-  const gamesClosed = [];
-
-  // Split games to open and slode
-  newTeam.games.forEach((g) => {
-    if (new Date(g.close_at).getTime() > new Date().getTime()) {
-      gamesOpen.push(g);
-    } else {
-      gamesClosed.push(g);
-    }
-  });
-
-  // Sort open games
-  gamesOpen.sort(
-    (a, b) => new Date(a.close_at).getTime() - new Date(b.close_at).getTime()
-  );
-
-  // Sort closed games
-  gamesClosed.sort(
-    (a, b) => new Date(b.close_at).getTime() - new Date(a.close_at).getTime()
-  );
-
-  newTeam.games = newGames.concat(gamesOpen, gamesClosed);
-
-  return newTeam;
-}
+    res.status(200).send(plainTeam);    
+  } catch (err) {
+    res.status(400).send(err);
+  }
+};
 
 // Get team statistics
 exports.teamStatistics = async (req, res) => {

@@ -54,7 +54,8 @@ router.route('/team').post(mUser.isLoggedIn, mTeam.teamInsert); // Add new team
 router.route('/team/:_id_team').patch(mUser.isLoggedIn, mMember.is.adminByID, mTeam.teamUpdate); // Update team
 router.route('/team/:_id_team').delete(mUser.isLoggedIn, mMember.is.adminByID, mTeam.teamDelete); // Delete team
 router.route('/team/:_id_team').get(mUser.isLoggedIn, mMember.is.memberByID, mTeam.teamGet); // Get basic team by ID
-router.route('/full_team/:url').get(mUser.isLoggedIn, mMember.is.memberByURL, mTeam.teamFullGet); // Get full team data by URL
+router.route('/full_team/:url').get(mUser.isLoggedIn, mMember.is.memberByURL, mTeam.teamGetBasic); // Get full team data by URL
+router.route('/fill_team/:url').get(mUser.isLoggedIn, mMember.is.memberByURL, mTeam.teamGetFill); // Get games portion
 
 router.route('/statistics/:url').get(mUser.isLoggedIn, mMember.is.memberByURL, mTeam.teamStatistics); // Get full team statistics
 
